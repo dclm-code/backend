@@ -14,7 +14,7 @@ class QualificationController extends Controller
      */
     public function index()
     {
-        //
+        return Qualification::all();
     }
 
     /**
@@ -33,9 +33,13 @@ class QualificationController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $req)
     {
-        //
+        $qualification = Qualification::create($req->all()) ;
+        $mesg = array("status"=>"success",
+        "message"=>"Qualification created successfully!");
+        return response()->json($mesg, 200);
+           
     }
 
     /**
@@ -46,7 +50,7 @@ class QualificationController extends Controller
      */
     public function show(Qualification $qualification)
     {
-        //
+        return $qualification;
     }
 
     /**
@@ -67,9 +71,13 @@ class QualificationController extends Controller
      * @param  \App\Qualification  $qualification
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Qualification $qualification)
+    public function update(Request $req, Qualification $qualification)
     {
-        //
+        $qualification->update($req->all());
+        $mesg = array("status"=>"success",
+        "message"=>"Qualification, successfully updated!");
+        return response()->json($mesg, 200);
+        
     }
 
     /**
@@ -80,6 +88,7 @@ class QualificationController extends Controller
      */
     public function destroy(Qualification $qualification)
     {
-        //
+        $qualification->delete();
+        return response()->json(null, 204);
     }
 }

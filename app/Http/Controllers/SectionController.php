@@ -14,7 +14,7 @@ class SectionController extends Controller
      */
     public function index()
     {
-        //
+        return Section::all();
     }
 
     /**
@@ -33,9 +33,13 @@ class SectionController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $req)
     {
-        //
+        $section = Section::create($req->all()) ;
+        $mesg = array("status"=>"success",
+        "message"=>"Section created successfully!");
+        return response()->json($mesg, 200);
+        //return response()->json($req);
     }
 
     /**
@@ -46,7 +50,7 @@ class SectionController extends Controller
      */
     public function show(Section $section)
     {
-        //
+        return $section;
     }
 
     /**
@@ -67,9 +71,12 @@ class SectionController extends Controller
      * @param  \App\Section  $section
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Section $section)
+    public function update(Request $req, Section $section)
     {
-        //
+        $section->update($req->all());
+        $mesg = array("status"=>"success",
+        "message"=>"Section, successfully updated!");
+        return response()->json($mesg, 200);
     }
 
     /**
@@ -80,6 +87,7 @@ class SectionController extends Controller
      */
     public function destroy(Section $section)
     {
-        //
+        $section->delete();
+        return response()->json(null, 204);
     }
 }
