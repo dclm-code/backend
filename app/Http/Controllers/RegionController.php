@@ -14,7 +14,7 @@ class RegionController extends Controller
      */
     public function index()
     {
-        //
+        return Region::all();
     }
 
     /**
@@ -33,9 +33,12 @@ class RegionController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $req)
     {
-        //
+        $region = Region::create($req->all());
+        $mesg = array ("status"=>"success",
+        "message"=>"Region created successfully!");
+        return response()->json($mesg, 200);
     }
 
     /**
@@ -46,7 +49,7 @@ class RegionController extends Controller
      */
     public function show(Region $region)
     {
-        //
+        return $region;
     }
 
     /**
@@ -67,9 +70,12 @@ class RegionController extends Controller
      * @param  \App\Region  $region
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Region $region)
+    public function update(Request $req, Region $region)
     {
-        //
+        $region->update($req->all());
+        $mesg = array ("status"=> "sucess",
+        "message"=>"region, successfully updated!");
+        return response()->json($mesg, 200);
     }
 
     /**
@@ -80,6 +86,7 @@ class RegionController extends Controller
      */
     public function destroy(Region $region)
     {
-        //
+        $region->delete();
+        return response()->json(null, 204);
     }
 }

@@ -14,7 +14,9 @@ class GroupLgaController extends Controller
      */
     public function index()
     {
-        //
+        
+            return GroupLga::all();
+        
     }
 
     /**
@@ -33,9 +35,12 @@ class GroupLgaController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $req)
     {
-        //
+        $grouplga = GroupLga::create($req->all());
+        $mesg = array ("status"=>"success",
+        "message"=>"GroupLga created successfully!");
+        return response()->json($mesg, 200);
     }
 
     /**
@@ -44,9 +49,9 @@ class GroupLgaController extends Controller
      * @param  \App\GroupLga  $groupLga
      * @return \Illuminate\Http\Response
      */
-    public function show(GroupLga $groupLga)
+    public function show(GroupLga $grouplga)
     {
-        //
+        return $grouplga;
     }
 
     /**
@@ -67,9 +72,12 @@ class GroupLgaController extends Controller
      * @param  \App\GroupLga  $groupLga
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, GroupLga $groupLga)
+    public function update(Request $req, GroupLga $grouplga)
     {
-        //
+        $grouplga->update($req->all());
+        $mesg = array ("status"=> "sucess",
+        "message"=>"grouplga, successfully updated!");
+        return response()->json($mesg, 200);
     }
 
     /**
@@ -78,8 +86,9 @@ class GroupLgaController extends Controller
      * @param  \App\GroupLga  $groupLga
      * @return \Illuminate\Http\Response
      */
-    public function destroy(GroupLga $groupLga)
+    public function destroy(GroupLga $grouplga)
     {
-        //
+        $grouplga->delete();
+        return response()->json(null, 204);
     }
 }
