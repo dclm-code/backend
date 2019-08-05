@@ -37,16 +37,16 @@ class StateController extends Controller
      */
     public function store(Request $req)
     {
-        if(strtolower(strtolower($this->currentUser()->role)) === "admin staff"){
+        if(strtolower(strtolower($this->currentUser()->role)) === "admin staff" || 
+        strtolower($this->currentUser()->role) === "super admin"){
             $state = State::create($req->all());
-            $mesg = array("staus"=>"success",
-                            "message"=> "State created successfully!");
+            $mesg = array("status"=>"success",
+                            "info"=> "State created successfully!");
             return response()->json($mesg, 200);
         }else{
             return response()->json([
-                "status" => "unathorized",
                 "info" => "You are not allowed to create state."
-            ], 401);
+            ], 403);
         }
     }
 
@@ -58,12 +58,13 @@ class StateController extends Controller
      */
     public function show(State $state)
     {
-        if(strtolower($this->currentUser()->role) === "admin staff"){
+        if(strtolower($this->currentUser()->role) === "admin staff" || 
+        strtolower($this->currentUser()->role) === "super admin"){
             return $state;
         }else{
             return response()->json([
                 "info" => "You are not allowed."
-            ], 401);
+            ], 403);
         }
         
     }
@@ -88,15 +89,16 @@ class StateController extends Controller
      */
     public function update(Request $req, State $state)
     {
-        if($this->currentUser()->role !== "staff member"){
+        if(strtolower($this->currentUser()->role) === "admin staff" || 
+        strtolower($this->currentUser()->role) === "super admin"){
             $state->update($req->all());
             $mesg = array("status"=>"success",
-            "message"=>"state, succesfully updated!");
+            "info"=>"state, succesfully updated!");
             return response()->json($mesg, 200);
         }else{
             return response()->json([
                 "info" => "Not allowed."
-            ], 401);
+            ], 403);
         }
     }
 
@@ -108,13 +110,13 @@ class StateController extends Controller
      */
     public function destroy(State $state)
     {
-        if($this->currentUser()->role !== "staff member"){
+        if(strtolower($this->currentUser()->role) === "super admin"){
             $state->delete();
             return response()->json(null, 204);
         }else{
             return response()->json([
                 "info" => "Not allowed."
-            ], 401);
+            ], 403);
         }
         
     }

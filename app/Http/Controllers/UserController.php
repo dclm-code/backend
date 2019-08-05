@@ -49,12 +49,12 @@ class UserController extends Controller
         $user = User::create($request->all());
         if($user){
             $msg = array("status"=>"success",
-                "message"=>"staff data saved successfully.");
+                "info"=>"staff data saved successfully.");
             return response()->json($msg, 200);
         }else{
             $msg = array("status"=>"failed",
-                "message"=>"There is an error, staff data not saved.");
-            return response()->json($msg, 400);
+                "info"=>"There is an error, staff data not saved.");
+            return response()->json($msg, 500);
         }
     }
 
@@ -71,7 +71,9 @@ class UserController extends Controller
         $user->id == $this->currentUser()->id) {
             return $user;
         } else {
-            return response()->json(null, 204);
+            return response()->json([
+                "info" => "You are not allowed."
+            ], 403);
         }
     }
 
@@ -98,18 +100,17 @@ class UserController extends Controller
         if($request->staff_id === $this->currentUser()->staff_id){
             if($user->update($request->all())){
                 $msg = array("status"=>"success",
-                    "message"=>"staff data updated successfully.");
+                    "info"=>"staff data updated successfully.");
                 return response()->json($msg, 200);
             }else{
                 $mg = array("status"=>"failed",
-                    "message"=>"staff data not updated.");
-                return response()->json($msg, 400);
+                    "info"=>"staff data not updated.");
+                return response()->json($msg, 500);
             }
         } else {
             return response()->json([
-                "status" => "unathorized",
                 "info" => "Update not allowed"
-            ], 401);
+            ], 403);
         }
         
     }
@@ -124,17 +125,18 @@ class UserController extends Controller
     {
         if($user->staff_id === $this->currentUser()->staff_id){
             if($user->delete()){
-                return response()->json(null, 204);
+                return response()->json([
+                    "info" => "User deleted successfully."
+                ], 204);
             }else{
                 $msg = array("status"=>"failed",
-                    "message"=>"staff data not deleted.");
+                    "info"=>"staff data not deleted.");
                 return response()->json($msg, 400);
             }
         }else{
             return response()->json([
-                "status" => "failed",
                 "info" => "Delete not allowed."
-            ], 401);
+            ], 403);
         }       
         
     }

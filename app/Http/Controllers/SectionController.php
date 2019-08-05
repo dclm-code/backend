@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Section;
 use Illuminate\Http\Request;
+use Auth;
 
 class SectionController extends Controller
 {
@@ -45,20 +46,21 @@ class SectionController extends Controller
      */
     public function store(Request $req)
     {
-        if(strtolower($this->currentUser()->role) === "admin staff"){
+        if(strtolower($this->currentUser()->role) === "admin staff" || 
+        strtolower($this->currentUser()->role) === "super admin"){
             if($section->update($req->all())){
                 $mesg = array("status"=>"success",
-            "message"=>"Section  successfully updated!");
-                return response() ->json($mesg, 200);
+            "info"=>"Section  successfully updated!");
+                return response()->json($mesg, 200);
             } else {
                 $mesg = array("status"=>"failed",
-            "message"=>"Section not updated!");
-                return response() ->json($mesg, 400);
+            "info"=>"Section not updated!");
+                return response()->json($mesg, 400);
             }
         }else{
             return response()->json([
                 "info" => "You are not allowed to create Section."
-            ], 401);
+            ], 403);
         }
     }
 
@@ -70,12 +72,13 @@ class SectionController extends Controller
      */
     public function show(Section $section)
     {
-        if(strtolower($this->currentUser()->role) === "admin staff"){
+        if(strtolower($this->currentUser()->role) === "admin staff" || 
+        strtolower($this->currentUser()->role) === "super admin"){
             return $section;
         }else{
             return response()->json([
                 "info" => "You can not view Section."
-            ], 401);
+            ], 403);
         }
     }
 
@@ -99,15 +102,16 @@ class SectionController extends Controller
      */
     public function update(Request $req, Section $section)
     {
-        if(strtolower($this->currentUser()->role) === "admin staff"){
+        if(strtolower($this->currentUser()->role) === "admin staff" || 
+        strtolower($this->currentUser()->role) === "super admin"){
             $section->update($req->all());
             $mesg = array("status"=>"success",
-            "message"=>"Section, successfully updated!");
+            "info"=>"Section, successfully updated!");
             return response()->json($mesg, 200);
         }else{
             return response()->json([
                 "info" => "You are not allowed to update Section."
-            ], 401);
+            ], 403);
         }
     }
 
@@ -119,13 +123,15 @@ class SectionController extends Controller
      */
     public function destroy(Section $section)
     {
-        if(strtolower($this->currentUser()->role) === "admin staff"){
+        if(strtolower($this->currentUser()->role) === "super admin"){
             $section->delete();
-            return response()->json(null, 204);
+            return response()->json([
+                "info" => "Section deleted successfully."
+            ], 204);
         }else{
             return response()->json([
                 "info" => "You are not allowed to delete Section."
-            ], 401);
+            ], 403);
         }
     }
 }

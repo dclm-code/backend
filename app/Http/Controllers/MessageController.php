@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Message;
 use Illuminate\Http\Request;
+use Auth;
 
 class MessageController extends Controller
     
@@ -46,11 +47,11 @@ class MessageController extends Controller
             $req->status = 1;
             $message = Message::create($req->all());
             $mesg = array("status"=>"success",
-            "message"=> "Message sent successfully!");
+            "info"=> "Message sent successfully!");
             return response()->json($mesg, 200);
         }else{
             return response()->json([
-                "message" => "You must be logged in to send message."
+                "info" => "You must be logged in to send message."
             ], 401);
         }
         
@@ -65,7 +66,7 @@ class MessageController extends Controller
     public function show(Message $message)
     {
         return $message::where('sender', $this->currentUser()->first_name)
-        ->orWhere('receiver', $this->currentUser()->first_name);
+        ->orWhere('receiver', $this->currentUser()->first_name)->get();
     }
 
     /**
@@ -94,7 +95,7 @@ class MessageController extends Controller
             $req->forwarded = 1;
             $message->update($req->all());
             $mesg = array("status"=>"success",
-            "message"=>"message, succesfully sent!");
+            "info"=>"message, succesfully sent!");
             return response()->json($mesg, 200);
         }else{
             return response()->json([
@@ -111,13 +112,15 @@ class MessageController extends Controller
      */
     public function destroy(Message $message)
     {
-        if($this->currentUser()){
+        if(strtolower($this->currentUser()->role)==="super admin"){
             $message->delete();
-            return response()->json(null, 204);
+            return response()->json([
+                "info" => "selected message deleted."
+            ], 204);
         }else{
             return response()->json([
-                "info" => "You must be logged in."
-            ], 401)
+                "info" => "You allowed to delete messages."
+            ], 403)
         }
     }
 }

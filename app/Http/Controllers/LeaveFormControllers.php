@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\LeaveForm;
 use Illuminate\Http\Request;
+use App\Department;
+use Auth;
 
 class LeaveFormControllers extends Controller
 {
@@ -16,6 +18,17 @@ class LeaveFormControllers extends Controller
         return Auth::guard('api')->user();
     }
 
+    /**
+     * return the current logged in user department
+     * 
+     * @return App\Department
+     */
+    protected function getDepartment(){
+        return Department::where('id', 
+            $this->currentUser()
+            ->department_id)->get()
+            ->department_name;
+    }
 
     /**
      * Display a listing of the resource.
@@ -24,7 +37,15 @@ class LeaveFormControllers extends Controller
      */
     public function index()
     {
-        return LeaveForm::all();
+        if(strtolower($this->currentUser()->role) === "admin staff" || 
+        strtolower($this->currentUser()->role) === "super admin" || 
+        strtolower($this->getDepartment())==="administrative"){
+            return LeaveForm::all();
+        }else{
+            return LeaveForm::where('staff_id', 
+                $this->currentUser()
+                ->staff_id)->get()
+        }
     }
 
     /**
@@ -42,10 +63,16 @@ class LeaveFormControllers extends Controller
      */
     public function store(Request $req)
     {
-        $LeaveForm = LeaveForm::create($req->all());
-        $mesg = array("staus"=>"success",
-        "message"=> "LeaveForm created successfully!");
-        return response()->json($mesg, 200);
+        if($this->currentUser()){
+            $LeaveForm = LeaveForm::create($req->all());
+            $mesg = array("staus"=>"success",
+            "info"=> "LeaveForm created successfully!");
+            return response()->json($mesg, 200);
+        }else{
+            return response()->json([
+                "info" => "You must be logged in to request a leave."
+            ], 401);
+        }
     }
 
     /**
@@ -54,9 +81,19 @@ class LeaveFormControllers extends Controller
      * @param  \App\LeaveForm  $LeaveForm
      * @return \Illuminate\Http\Response
      */
-    public function show(   LeaveForm $leaveform)
+    public function show(LeaveForm $leaveform)
     {
-        return $leaveform;
+        if(strtolower($this->currentUser()->role)==="admin staff" || 
+        strtolower($this->currentUser()->role)==="super admin" || 
+        strtolower($this->getDepartment())==="admininstrative"){
+            return $leaveform;
+        }else if($leaveform->staff_id === $this->currentUser()->staff_id){
+            return $leaveform;
+        }else{
+            return response()->json([
+                "info" => "You are not allowed."
+            ], 403);
+        }
     }
 
 
@@ -80,10 +117,19 @@ class LeaveFormControllers extends Controller
      */
     public function update(Request $req, LeaveForm $leaveform)
     {
-        $leaveform->update($req->all());
-        $mesg = array("status"=>"success",
-        "message"=>"LeaveForm, succesfully updated!");
-        return response()->json($mesg, 200);
+        if(strtolower($this->currentUser()->role)==="admin staff" || 
+        strtolower($this->currentUser()->role)==="super admin" || 
+        strtolower($this->getDepartment())==="admininstrative" || 
+        $this->getDepartment() === Department::getDepartment($leaveform->staff_id)){
+            $leaveform->update($req->all());
+            $mesg = array("status"=>"success",
+            "info"=>"LeaveForm, succesfully updated!");
+            return response()->json($mesg, 200);
+        }else{
+            return response()->json([
+                "info" => "You can not update this."
+            ], 403);
+        }
     }
 
     /**
@@ -94,7 +140,16 @@ class LeaveFormControllers extends Controller
      */
     public function destroy(LeaveForm $LeaveForm)
     {
-        $LeaveForm->delete();
-        return response()->json(null, 204);
+        if(strtolower($this->currentUser()->role)==="super admin" || 
+        $this->getDepartment() === Department::getDepartment($leaveform->staff_id)){
+            $LeaveForm->delete();
+            return response()->json([
+                "info" => "Leave request deleted successfully."
+            ], 204);
+        }else{
+            return response()->json([
+                "info" => "Sorry, you can not delete leave request."
+            ], 403);
+        }
     }
 }

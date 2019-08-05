@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Fuel;
 use Illuminate\Http\Request;
+use App\Department;
+use Auth;
 
 class FuelController extends Controller
 {
@@ -14,6 +16,17 @@ class FuelController extends Controller
      */
     protected function currentUser(){
         return Auth::guard('api')->user();
+    }
+
+    /**
+     * return the department of the current logged in user
+     * 
+     * @return App\Department
+     */
+    protected function getDepartment(){
+        return Department::where('id', 
+            $this->currentUser()
+            ->department_id)->get();
     }
 
     /**
@@ -41,9 +54,9 @@ class FuelController extends Controller
      */
     public function store(Request $req)
     {
-        $Fuel = Fuel::create($req->all());
+        Fuel::create($req->all());
         $mesg = array("staus"=>"success",
-        "message"=> "Fuel created successfully!");
+            "info"=> "Fuel created successfully!");
         return response()->json($mesg, 200);
     }
 
@@ -55,7 +68,15 @@ class FuelController extends Controller
      */
     public function show(Fuel $fuel)
     {
-        return $fuel;
+        if(strtolower($this->currentUser()->role) === "admin staff" || 
+        strtolower($this->currentUser()->role) === "super admin" || 
+        strtolower($this->getDepartment()) === "administrative"){
+            return $fuel;
+        }else{
+            return response()->json([
+                "info" => "You can not view Fuel detail."
+            ], 403);
+        }
     }
 
     /**
@@ -66,7 +87,7 @@ class FuelController extends Controller
      */
     public function edit(Fuel $fuel)
     {
-        return $fuel;
+        //return $fuel;
     }
 
     /**
@@ -78,10 +99,18 @@ class FuelController extends Controller
      */
     public function update(Request $req, Fuel $fuel)
     {
-        $fuel->update($req->all());
-        $mesg = array("status"=>"success",
-        "message"=>"Fuel, succesfully updated!");
-        return response()->json($mesg, 200);
+        if(strtolower($this->currentUser()->role) === "admin staff" || 
+        strtolower($this->currentUser()->role) === "super admin" || 
+        strtolower($this->getDepartment()) === "administrative"){
+            $fuel->update($req->all());
+            $mesg = array("status"=>"success",
+            "info"=>"Fuel, succesfully updated!");
+            return response()->json($mesg, 200);
+        }else{
+            return response()->json([
+                "info" => "You cannot update fuel request."
+            ], 403);
+        }
     }
 
     /**
@@ -92,7 +121,17 @@ class FuelController extends Controller
      */
     public function destroy(Fuel $fuel)
     {
-        $fuel->delete();
-        return response()->json(null, 204);
+        if(strtolower($this->currentUser()->role) === "admin staff" || 
+        strtolower($this->currentUser()->role) === "super admin" || 
+        strtolower($this->getDepartment()) === "administrative"){
+            $fuel->delete();
+            return response()->json([
+                "info" => "Fuel request deleted successfully."
+            ], 204);
+        }else{
+            return response()->json([
+                "info" => "You are not allowed to delete Fuel request."
+            ], 403);
+        }
     }
 }

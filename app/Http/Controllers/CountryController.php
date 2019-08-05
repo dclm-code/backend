@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 
 use App\Country;
 use Illuminate\Http\Request;
-use App\User;
 use Auth;
 
 class CountryController extends Controller
@@ -39,20 +38,21 @@ class CountryController extends Controller
      */
     public function store(Request $req)
     {
-        if(strtolower($this->currentUser()->role) === "admin staff"){
-            if($country->update($req->all())){
+        if(strtolower($this->currentUser()->role) === "admin staff" || 
+        strtolower($this->currentUser()->role) === "super admin"){
+            if(Country::create($req->all())){
                 $mesg = array("status"=>"success",
-            "message"=>"Country  successfully updated!");
+            "info"=>"Country  successfully updated!");
                 return response() ->json($mesg, 200);
             } else {
                 $mesg = array("status"=>"failed",
-            "message"=>"Country not updated!");
-                return response() ->json($mesg, 400);
+            "info"=>"Country not updated!");
+                return response() ->json($mesg, 500);
             }
         }else{
             return response()->json([
                 "info" => "You are not allowed to create Country.",
-            ], 401);
+            ], 403);
         }
     }
 
@@ -64,12 +64,13 @@ class CountryController extends Controller
      */
     public function show(Country $country)
     {
-        if(strtolower($this->currentUser()->role )=== "admin staff"){
+        if(strtolower($this->currentUser()->role )=== "admin staff" ||
+        strtolower($this->currentUser()->role) === "super admin"){
             return $country;    
         }else{
             return response()->json([
                 "info" => "You cannot view this.",
-            ], 401);
+            ], 403);
         }
         
     }
@@ -94,10 +95,17 @@ class CountryController extends Controller
      */
     public function update(Request $req, Country $country)
     {
-        $country->update($req->all());
-        $mesg = array("status"=>"success",
-        "message"=>"country, succesfully updated!");
-        return response()->json($mesg, 200);
+        if(strtolower($this->currentUser()->role)=== "admin staff" ||
+        strtolower($this->currentUser()->role) === "super admin"){
+            $country->update($req->all());
+            $mesg = array("status"=>"success",
+            "info"=>"country, succesfully updated!");
+            return response()->json($mesg, 200);
+        } else {
+            return response()->json([
+                "info" => "You cannot update country.",
+            ], 403);
+        }
     }
 
     /**
@@ -108,7 +116,7 @@ class CountryController extends Controller
      */
     public function destroy(Country $country)
     {
-        if(strtolower($this->currentUser()->role) === "admin staff"){
+        if(strtolower($this->currentUser()->role) === "super admin"){
             $country->delete();
             return response()->json([
                 "info" => "Country deleted.",
@@ -116,7 +124,7 @@ class CountryController extends Controller
         }else{
             return response()->json([
                 "info" => "You are not allowed to delete country.",
-            ], 401);
+            ], 403);
         }
         
     }

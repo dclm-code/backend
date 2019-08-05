@@ -43,15 +43,16 @@ class DepartmentController extends Controller
      */
     public function store(Request $req)
     {
-        if(strtolower($this->currentUser()->role) === "admin staff"){
-            $department = Department::create($req->all());
+        if(strtolower($this->currentUser()->role) === "admin staff" || 
+        strtolower($this->currentUser()->role) === "super admin"){
+            Department::create($req->all());
             $mesg = array("staus"=>"success",
-            "message"=> "Department created successfully!");
+            "info"=> "Department created successfully!");
             return response()->json($mesg, 200);
         }else{
             return response()->json([
                 "info" => "You are not allowed to create department."
-            ], 401);
+            ], 403);
         }
     }
 
@@ -63,14 +64,31 @@ class DepartmentController extends Controller
      */
     public function show(Department $department)
     { 
-        if(strtolower($this->currentUser()->role) === "admin staff"){
+        if(strtolower($this->currentUser()->role) === "admin staff" || 
+        strtolower($this->currentUser()->role) === "super admin"){
             return $department;
         }else{
             return response()->json([
                 "info" => "You can not view department detail."
-            ], 401);
+            ], 403);
         }
         
+    }
+
+    /**
+     * returns department given staff_id
+     * 
+     * @param \App\User\staff_id $staff_id
+     * @return \App\Department
+     */
+    public function getDepartment($staff_id){
+        $dept_id = User::where('staff_id', 
+            $staff_id)->get()
+            ->department_id;
+
+        return Department::where('id', 
+            $dept_id)->get()
+            ->department_name;
     }
 
     /**
@@ -93,20 +111,21 @@ class DepartmentController extends Controller
      */
     public function update(Request $req, Department $department)
     {
-        if(strtolower($this->currentUser()->role) === "admin staff"){
+        if(strtolower($this->currentUser()->role) === "admin staff" || 
+        strtolower($this->currentUser()->role) === "super admin"){
             if($department->update($req->all())){
                 $mesg = array("status"=>"success",
-            "message"=>"Department  successfully updated!");
+            "info"=>"Department  successfully updated!");
                 return response() ->json($mesg, 200);
             } else {
                 $mesg = array("status"=>"failed",
-            "message"=>"Department not updated!");
-                return response() ->json($mesg, 400);
+            "info"=>"Department not updated!");
+                return response() ->json($mesg, 500);
             }
         }else{
             return response()->json([
                 "info" => "You are not allowed to update department."
-            ], 401);
+            ], 403);
         }
     }
 
@@ -118,13 +137,16 @@ class DepartmentController extends Controller
      */
     public function destroy(Department $department)
     {
-        if(strtolower($this->currentUser()->role) === "admin staff"){
+        if(strtolower($this->currentUser()->role) === "admin staff" ||  
+        strtolower($this->currentUser()->role) === "super admin"){
             $department->delete();
-            return response()->json(null, 204);
+            return response()->json([
+                "info" => "Department deleted successfully."
+            ], 204);
         }else{
             return response()->josn([
                 "info" => "You are not allowed to delete department."
-            ], 401);
+            ], 403);
         }
         
     }

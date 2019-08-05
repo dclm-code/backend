@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Region;
 use Illuminate\Http\Request;
+use Auth;
 
 class RegionController extends Controller
 {
@@ -45,20 +46,21 @@ class RegionController extends Controller
      */
     public function store(Request $req)
     {
-        if(strtolower($this->currentUser()->role) === "admin staff"){
+        if(strtolower($this->currentUser()->role) === "admin staff" || 
+        strtolower($this->currentUser()->role) === "super admin"){
             if($region->update($req->all())){
                 $mesg = array("status"=>"success",
-            "message"=>"Region  successfully updated!");
+            "info"=>"Region  successfully updated!");
                 return response() ->json($mesg, 200);
             } else {
                 $mesg = array("status"=>"failed",
-            "message"=>"Region not updated!");
+            "info"=>"Region not updated!");
                 return response() ->json($mesg, 400);
             }
         }else{
             return response()->json([
                 "info" => "You are not alowed to create Region."
-            ], 401);
+            ], 403);
         }
     }
 
@@ -70,12 +72,13 @@ class RegionController extends Controller
      */
     public function show(Region $region)
     {
-        if(strtolower($this->currentUser()->role) === "admin staff"){
+        if(strtolower($this->currentUser()->role) === "admin staff" || 
+        strtolower($this->currentUser()->role) === "super admin"){
             return $region;
         }else{
             return response()->json([
                 "info" => "You are not allowed to view Region."
-            ], 401);
+            ], 403);
         }
     }
 
@@ -99,15 +102,16 @@ class RegionController extends Controller
      */
     public function update(Request $req, Region $region)
     {
-        if(strtolower($this->currentUser()->role) === "admin staff"){
+        if(strtolower($this->currentUser()->role) === "admin staff" || 
+        strtolower($this->currentUser()->role) === "super admin"){
             $region->update($req->all());
             $mesg = array ("status"=> "sucess",
-            "message"=>"region, successfully updated!");
+            "info"=>"region, successfully updated!");
             return response()->json($mesg, 200);
         }else{
             return response()->json([
                 "info" => "You are not allowed to update Region."
-            ], 401);
+            ], 403);
         }
     }
 
@@ -119,13 +123,15 @@ class RegionController extends Controller
      */
     public function destroy(Region $region)
     {
-       if(strtolower($this->currentUser()->role) === "admin staff"){
+       if(strtolower($this->currentUser()->role) === "super admin"){
             $region->delete();
-            return response()->json(null, 204);
+            return response()->json([
+                "info" => "Region deleted successfully."
+            ], 204);
        }else{
            return response()->json([
                "info" => "You are not allowed to delete Region."
-           ], 401);
+           ], 403);
        }
     }
 }

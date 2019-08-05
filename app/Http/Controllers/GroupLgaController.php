@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\GroupLga;
 use Illuminate\Http\Request;
+use Auth;
 
 class GroupLgaController extends Controller
 {
@@ -44,15 +45,16 @@ class GroupLgaController extends Controller
      */
     public function store(Request $req)
     {
-        if(strtolower($this->currentUser()->role) === "admin staff"){
+        if(strtolower($this->currentUser()->role) === "admin staff" || 
+        strtolower($this->currentUser()->role) === "super admin"){
             $grouplga = GroupLga::create($req->all());
             $mesg = array ("status"=>"success",
-            "message"=>"GroupLga created successfully!");
+            "info"=>"GroupLga created successfully!");
             return response()->json($mesg, 200);
         }else{
             return response()->json([
                 "info" => "You are not allowed to create Group/Local Government."
-            ], 401);
+            ], 403);
         }
     }
 
@@ -64,12 +66,13 @@ class GroupLgaController extends Controller
      */
     public function show(GroupLga $grouplga)
     {
-        if(strtolower($this->currentUser()->role) === "admin staff"){
+        if(strtolower($this->currentUser()->role) === "admin staff" || 
+        strtolower($this->currentUser()->role) === "super admin"){
             return $grouplga;
         }else{
             return response()->json([
                 "info" => "You can not view Group/Local Government."
-            ], 401);
+            ], 403);
         }
     }
 
@@ -93,20 +96,21 @@ class GroupLgaController extends Controller
      */
     public function update(Request $req, GroupLga $grouplga)
     {
-        if(strtolower($this->currentUser()->role) === "admin staff"){
+        if(strtolower($this->currentUser()->role) === "admin staff" || 
+        strtolower($this->currentUser()->role) === "super admin"){
             if($grouplga->update($req->all())){
                 $mesg = array("status"=>"success",
-            "message"=>"Group/lga  successfully updated!");
-                return response() ->json($mesg, 200);
+            "info"=>"Group/lga  successfully updated!");
+                return response()->json($mesg, 200);
             } else {
                 $mesg = array("status"=>"failed",
-            "message"=>"Group/lga not updated!");
-                return response() ->json($mesg, 400);
+            "info"=>"Group/lga not updated!");
+                return response() ->json($mesg, 500);
             }
         }else{
             return response()->json([
                 "info" => "You are not allowed to update Group/Local Government."
-            ], 401);
+            ], 403);
         }
         
     }
@@ -119,13 +123,15 @@ class GroupLgaController extends Controller
      */
     public function destroy(GroupLga $grouplga)
     {
-       if(strtolower($this->currentUser()->role) === "admin staff"){
-        $grouplga->delete();
-        return response()->json(null, 204);
+       if(strtolower($this->currentUser()->role) === "super admin"){
+            $grouplga->delete();
+            return response()->json([
+                "info" => "Group/Local Government deleted successfully."
+            ], 204);
        }else{
            return response()->json([
                "info" => "You are not allowed to delete Group/Local Government."
-           ], 401);
+           ], 403);
        }
     }
 }

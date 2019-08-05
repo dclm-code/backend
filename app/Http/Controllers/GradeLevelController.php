@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\GradeLevel;
 use Illuminate\Http\Request;
+use Auth;
 
 class GradeLevelController extends Controller
 {
@@ -44,15 +45,16 @@ class GradeLevelController extends Controller
      */
     public function store(Request $req)
     {
-        if(strtolower($this->currentUser()->role) === "admin staff"){
+        if(strtolower($this->currentUser()->role) === "admin staff" || 
+        strtolower($this->currentUser()->role) === "super admin"){
             $gradelevel = GradeLevel::create($req->all());
             $mesg = array("status"=>"success",
-            "message"=>"GradeLevel created successfully!");
+            "info"=>"GradeLevel created successfully!");
             return response()->json($mesg, 200);
         }else{
             return response()->json([
                 "info" => "You not allowed to created Grade Level."
-            ], 401);
+            ], 403);
         }
     }
 
@@ -64,12 +66,13 @@ class GradeLevelController extends Controller
      */
     public function show(GradeLevel $gradelevel)
     {
-        if(strtolower($this->currentUser()->role) === "admin staff"){
+        if(strtolower($this->currentUser()->role) === "admin staff" || 
+        strtolower($this->currentUser()->role) === "super admin"){
             return $gradelevel;
         }else{
             return response()->json([
                 "info" => "You can not view Grade Level."
-            ], 401);
+            ], 403);
         }
         
     }
@@ -97,12 +100,12 @@ class GradeLevelController extends Controller
         if(strtolower($this->currentUser()->role) === "admin staff"){
             $gradeLevel->update($req->all());
             $mesg = array("status"=>"success",
-            "message"=>"Grade Level, successfully updated!");
+            "info"=>"Grade Level, successfully updated!");
             return response()->json($mesg, 200);
         }else{
             return response()->json([
                 "info" => "You are not allowed to update Grade Level."
-            ], 401);
+            ], 403);
         }
     }
 
@@ -114,13 +117,15 @@ class GradeLevelController extends Controller
      */
     public function destroy(GradeLevel $gradeLevel)
     {
-        if(strtolower($this->currentUser()->role) === "admin staff"){
+        if(strtolower($this->currentUser()->role) === "super admin"){
             $gradeLevel ->delete();
-            return response() ->json(null,294);
+            return response() ->json([
+                "info" => "Grade Level deleted successfully."
+            ],204);
         }else{
             return response()->json([
                 "info" => "You are not allowed to delete Grade Level."
-            ], 401);
+            ], 403);
         }
     }
 }
