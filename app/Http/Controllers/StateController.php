@@ -112,7 +112,10 @@ class StateController extends Controller
     {
         if(strtolower($this->currentUser()->role) === "super admin"){
             $state->delete();
-            return response()->json(null, 204);
+            return response()->json([
+                "status" => "sucess",
+                "info" => "State deleted successfully."
+            ], 201);
         }else{
             return response()->json([
                 "info" => "Not allowed."

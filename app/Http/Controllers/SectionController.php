@@ -48,7 +48,7 @@ class SectionController extends Controller
     {
         if(strtolower($this->currentUser()->role) === "admin staff" || 
         strtolower($this->currentUser()->role) === "super admin"){
-            if($section->update($req->all())){
+            if(Section::create($req->all())){
                 $mesg = array("status"=>"success",
             "info"=>"Section  successfully updated!");
                 return response()->json($mesg, 200);
@@ -126,8 +126,9 @@ class SectionController extends Controller
         if(strtolower($this->currentUser()->role) === "super admin"){
             $section->delete();
             return response()->json([
+                "status" => "success",
                 "info" => "Section deleted successfully."
-            ], 204);
+            ], 200);
         }else{
             return response()->json([
                 "info" => "You are not allowed to delete Section."

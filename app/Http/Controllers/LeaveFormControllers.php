@@ -65,7 +65,7 @@ class LeaveFormControllers extends Controller
     {
         if($this->currentUser()){
             $LeaveForm = LeaveForm::create($req->all());
-            $mesg = array("staus"=>"success",
+            $mesg = array("status"=>"success",
             "info"=> "LeaveForm created successfully!");
             return response()->json($mesg, 200);
         }else{
@@ -144,6 +144,7 @@ class LeaveFormControllers extends Controller
         $this->getDepartment() === Department::getDepartment($leaveform->staff_id)){
             $LeaveForm->delete();
             return response()->json([
+                "status" => "success",
                 "info" => "Leave request deleted successfully."
             ], 204);
         }else{

@@ -55,7 +55,7 @@ class FuelController extends Controller
     public function store(Request $req)
     {
         Fuel::create($req->all());
-        $mesg = array("staus"=>"success",
+        $mesg = array("status"=>"success",
             "info"=> "Fuel created successfully!");
         return response()->json($mesg, 200);
     }

@@ -48,7 +48,7 @@ class RegionController extends Controller
     {
         if(strtolower($this->currentUser()->role) === "admin staff" || 
         strtolower($this->currentUser()->role) === "super admin"){
-            if($region->update($req->all())){
+            if(Region::create($req->all())){
                 $mesg = array("status"=>"success",
             "info"=>"Region  successfully updated!");
                 return response() ->json($mesg, 200);
@@ -126,8 +126,9 @@ class RegionController extends Controller
        if(strtolower($this->currentUser()->role) === "super admin"){
             $region->delete();
             return response()->json([
+                "status" => "success",
                 "info" => "Region deleted successfully."
-            ], 204);
+            ], 201);
        }else{
            return response()->json([
                "info" => "You are not allowed to delete Region."

@@ -56,10 +56,10 @@ Route::group(['middleware' => 'auth:api'], function () {
 //Staff/Users End-points
 //Route::post('users', 'RegisterController@create');
 Route::get('users', 'UserController@index');
+Route::get('getUsers', 'UserController@getUserList');
 Route::get('users/{user}', 'UserController@show');
 Route::put('users/{user}', 'UserController@update');
 Route::delete('users/{user}', 'UserController@destroy');
-//Route::post('users/signin', 'UserController@signin');
 
 
 //Countries End-points
@@ -113,8 +113,8 @@ Route::delete('sections/{section}', 'SectionController@destroy');
 //Staff Grade Level endpoints
 Route::get('grade_levels/{gradelevel}', 'GradeLevelController@show');
 Route::post('grade_levels', 'GradeLevelController@store');
-Route::put('grade_levels/{gradelevel}', 'GradeLevelController@update');
-Route::delete('grade_levels/{gradelevel}', 'GradeLevelController@destroy');
+Route::put('grade_levels/{grade_level}', 'GradeLevelController@update');
+Route::delete('grade_levels/{grade_level}', 'GradeLevelController@destroy');
 
 //Inter-office memos/messages endpoints 
 Route::get('messages', 'MessageController@index');

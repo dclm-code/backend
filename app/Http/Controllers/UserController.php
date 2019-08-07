@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Auth;
 
 class UserController extends Controller
@@ -27,6 +28,31 @@ class UserController extends Controller
         }
         //return response()->json(User::all(), 200);
     }
+
+    /**
+     * return user array 
+     * @return \App\User object as an array
+     */
+    public function getUserList(Request $req){
+        if($this->currentUser()){
+            if($req->criteria !== "" && $req->criteria !== null){
+                $user = DB::table('users')
+                ->select(DB::raw("id, staff_id, first_name, surname"))
+                ->whereRaw("first_name like '%{$req->criteria}%' or surname like '%{$req->criteria}%'")
+                ->get();
+            return $user;
+        } else {
+            return response()->json([
+                "info" => "You can not search with null value, enter a name."
+            ], 403);
+        }
+        } else {
+            return response()->json([
+                "info" => "You must be logged in."
+            ], 401);
+        }        
+    }
+
 
     /**
      * Show the form for creating a new resource.
@@ -97,7 +123,9 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user)
     {
-        if($request->staff_id === $this->currentUser()->staff_id){
+        if($request->staff_id === $this->currentUser()->staff_id ||
+        strtolower($this->currentUser()->role)==="super admin" || 
+        strtolower($this->currentUser()->role)==="admin staff"){
             if($user->update($request->all())){
                 $msg = array("status"=>"success",
                     "info"=>"staff data updated successfully.");

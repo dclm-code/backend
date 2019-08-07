@@ -48,7 +48,7 @@ class QualificationController extends Controller
     {
         if(strtolower($this->currentUser()->role) === "admin staff" || 
         strtolower($this->currentUser()->role) === "super admin"){
-            if($qualification->update($req->all())){
+            if(Qualification::create($req->all())){
                 $mesg = array("status"=>"success",
             "info"=>"Qualification  successfully updated!");
                 return response() ->json($mesg, 200);
@@ -125,7 +125,10 @@ class QualificationController extends Controller
     {
         if(strtolower($this->currentUser()->role) === "super admin"){
             $qualification->delete();
-            return response()->json(null, 204);
+            return response()->json([
+                "status" => "success",
+                "info" => "Qualification deleted successfully."
+            ], 200);
         }else{
             return response()->json([
                 "info" => "You are not allowed to delete Qualification"

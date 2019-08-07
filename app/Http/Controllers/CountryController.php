@@ -42,11 +42,11 @@ class CountryController extends Controller
         strtolower($this->currentUser()->role) === "super admin"){
             if(Country::create($req->all())){
                 $mesg = array("status"=>"success",
-            "info"=>"Country  successfully updated!");
+            "info"=>"Country  saved successfully!");
                 return response() ->json($mesg, 200);
             } else {
                 $mesg = array("status"=>"failed",
-            "info"=>"Country not updated!");
+            "info"=>"Country not save!");
                 return response() ->json($mesg, 500);
             }
         }else{

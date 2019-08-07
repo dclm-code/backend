@@ -22,8 +22,8 @@ class MessageController extends Controller
     public function index()
     {
 
-        return Message::where('sender', $this->currentUser()->first_name)
-        ->orWhere('receiver', $this->currentUser()->first_name)->get();
+        return Message::where('sender', $this->currentUser()->staff_id)
+        ->orWhere('receiver', $this->currentUser()->staff_id)->get();
     }
 
     /**
@@ -42,10 +42,10 @@ class MessageController extends Controller
     public function store(Request $req)
     {
         if($this->currentUser()){
-            $req->sender = $this->currentUser()->first_name;
+            $req->sender = $this->currentUser()->staff_id;
             $req->date_sent = now();
             $req->status = 1;
-            $message = Message::create($req->all());
+            Message::create($req->all());
             $mesg = array("status"=>"success",
             "info"=> "Message sent successfully!");
             return response()->json($mesg, 200);
@@ -99,7 +99,7 @@ class MessageController extends Controller
             return response()->json($mesg, 200);
         }else{
             return response()->json([
-            "info" => "You must be logged in."],401)
+            "info" => "You must be logged in."],401);
         }
         
     }
@@ -120,7 +120,7 @@ class MessageController extends Controller
         }else{
             return response()->json([
                 "info" => "You allowed to delete messages."
-            ], 403)
+            ], 403);
         }
     }
 }

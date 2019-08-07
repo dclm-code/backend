@@ -126,8 +126,9 @@ class GroupLgaController extends Controller
        if(strtolower($this->currentUser()->role) === "super admin"){
             $grouplga->delete();
             return response()->json([
+                "status" => "success",
                 "info" => "Group/Local Government deleted successfully."
-            ], 204);
+            ], 200);
        }else{
            return response()->json([
                "info" => "You are not allowed to delete Group/Local Government."

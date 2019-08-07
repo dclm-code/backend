@@ -46,7 +46,7 @@ class DepartmentController extends Controller
         if(strtolower($this->currentUser()->role) === "admin staff" || 
         strtolower($this->currentUser()->role) === "super admin"){
             Department::create($req->all());
-            $mesg = array("staus"=>"success",
+            $mesg = array("status"=>"success",
             "info"=> "Department created successfully!");
             return response()->json($mesg, 200);
         }else{
@@ -141,8 +141,9 @@ class DepartmentController extends Controller
         strtolower($this->currentUser()->role) === "super admin"){
             $department->delete();
             return response()->json([
+                "status" => "success",
                 "info" => "Department deleted successfully."
-            ], 204);
+            ], 200);
         }else{
             return response()->josn([
                 "info" => "You are not allowed to delete department."

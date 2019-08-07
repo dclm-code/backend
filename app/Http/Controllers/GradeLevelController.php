@@ -97,7 +97,8 @@ class GradeLevelController extends Controller
      */
     public function update(Request $req, GradeLevel $gradeLevel)
     {
-        if(strtolower($this->currentUser()->role) === "admin staff"){
+        if(strtolower($this->currentUser()->role) === "admin staff" ||
+        strtolower($this->currentUser()->role) === "super admin"){
             $gradeLevel->update($req->all());
             $mesg = array("status"=>"success",
             "info"=>"Grade Level, successfully updated!");
@@ -118,10 +119,17 @@ class GradeLevelController extends Controller
     public function destroy(GradeLevel $gradeLevel)
     {
         if(strtolower($this->currentUser()->role) === "super admin"){
-            $gradeLevel ->delete();
-            return response() ->json([
-                "info" => "Grade Level deleted successfully."
-            ],204);
+            if($gradeLevel->delete()){
+                return response() ->json([
+                    "status" => "success",
+                    "info" => "Grade Level deleted successfully."
+                ],200);
+            }else{
+                return response()->json([
+                    "status" => "failed",
+                    "info" => "Not deleted."
+                ], 200);
+            }
         }else{
             return response()->json([
                 "info" => "You are not allowed to delete Grade Level."
