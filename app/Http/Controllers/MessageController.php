@@ -42,9 +42,8 @@ class MessageController extends Controller
     public function store(Request $req)
     {
         if($this->currentUser()){
-            $req->sender = $this->currentUser()->staff_id;
-            $req->date_sent = now();
-            $req->status = 1;
+            $req->request->add(['sender' => $this->currentUser()->staff_id, 'date_sent' => now(), 'status' => '1']);
+            $req->receiver = explode(":", $req->receiver)[0];
             Message::create($req->all());
             $mesg = array("status"=>"success",
             "info"=> "Message sent successfully!");
