@@ -116,6 +116,21 @@ Route::post('grade_levels', 'GradeLevelController@store');
 Route::put('grade_levels/{grade_level}', 'GradeLevelController@update');
 Route::delete('grade_levels/{grade_level}', 'GradeLevelController@destroy');
 
+//Leaveform endpoints
+Route::get('leaveforms', 'LeaveFormControllers@index');
+Route::post('leaveforms', 'LeaveFormControllers@store');
+Route::get('leaveforms/{leaveform}', 'LeaveFormControllers@show');
+Route::put('leaveforms/{leaveform}', 'LeaveFormControllers@update');
+Route::delete('leaveforms/{leaveform}', 'LeaveFormControllers@destroy');
+
+//fuel endpoints
+Route::get('fuels', 'FuelController@index');
+Route::post('fuels', 'FuelController@store');
+Route::get('fuels/{fuel}', 'FuelController@show');
+Route::put('fuels/{fuel}', 'FuelController@update');
+Route::delete('fuels/{fuel}', 'FuelController@destroy');
+
+
 //Inter-office memos/messages endpoints 
 Route::get('messages', 'MessageController@index');
 Route::get('messages/{message}', 'MessageController@show');

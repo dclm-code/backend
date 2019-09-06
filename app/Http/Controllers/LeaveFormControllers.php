@@ -44,7 +44,7 @@ class LeaveFormControllers extends Controller
         }else{
             return LeaveForm::where('staff_id', 
                 $this->currentUser()
-                ->staff_id)->get()
+                ->staff_id)->get();
         }
     }
 
